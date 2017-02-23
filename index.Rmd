@@ -1,0 +1,12 @@
+---
+title: "Final Assignment"
+author: "Henrik Husberg"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Open Data Science - Final Assignment
+
