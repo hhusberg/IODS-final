@@ -1,12 +1,38 @@
 ---
 title: "Final Assignment"
 author: "Henrik Husberg"
+date: "23.02 2017"
 output: html_document
 ---
-
+henrik.husberg@gmail.com
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Open Data Science - Final Assignment
 
+## _Abstract_
+
+_In the first part of this two-part study we attempt to identify the links between television viewing time, internet time, digital gaming time and ADHD-related behavior as well as school achievement in Finnish grade-school children (grades 1-9), controlling for gender, age and socioeconomic status. In the second part we investigate the relationships between electronic media usage in younger children (grades 1-3), ADHD-related behavior and cognitive performance. Results indicate small negative, mostly non-significant effects of television time on ADHD-related behavior and school achievement while a small positive relationship between internet and game time and visuospatial working memory. Previous research on the links between electronic media usage, attention and school achievement has been inconclusive. For example, some negative links have been shown between total hours viewing TV and school achievement and ADHD-related behaviors, while some positive links have been found between digital gaming and visual spatial skills. The current study sheds some light on these relationships._
+
+## Research Questions and Hypotheses
+
+The current research will attempt to address some of the above mentioned issues in two studies: in study 1 we investigate the relationship between television time, internet use and videogame playing and ADHD-related behavior and school achievement in grades 1-9. In Study 2 we investigate the relationship between the three measures of media use, ADHD-related behavior, school achievement and cognitive abilities in grades 1 and 3. In both studies, we control for age, gender and SES. Based on previous research we will test three hypotheses:
+
+**H1:** Media time has a small negative effect on ADHD-related behavior and school achievement.
+
+**H2:** An effect of media time on school achievement is partially mediated by increased ADHD-related behavior.
+
+**H3:** An effect of media time on ADHD-related behavior and school achievement is partially mediated by visuospatial ability.
+
+## Data Wrangling
+
+## Data Description
+
+## Descriptives
+
+## Method
+
+## Results
+
+## Discussion
