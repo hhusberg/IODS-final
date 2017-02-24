@@ -27,7 +27,100 @@ The current research will attempt to address some of the above mentioned issues 
 
 ## Data Wrangling
 
+_**Attention:** This is not a complete dataset and it may not be used outside this course. There are both variables and observations missing. Any inferences to real life are completely fictional and are only used for the purpose of this course. The dataset in its entirety belongs to the Niilo Mäki Institute and results based on the complete dataset will be presented at the JURE2017 conference for those interested._
+
+Read the data from SPSS-generated csv-file. Exciting, let's see how it works!
+
+_UPDATE: After looking around a bit, and first trying the "foreign" package and read.spss-function, which didn't work, I found the "memisc"" package with the as.data.set-function, which at first glance seems to work perfectly!_
+
+
+```{r}
+library(dplyr)
+library(memisc)
+kesky_all <- as.data.set(spss.system.file("./data/Kesky_luvat_final_tausta_very_short_1.sav"))
+str(kesky_all)
+summary(kesky_all$utb_grund_mamma)
+summary(kesky_all$medicinering)
+summary(kesky_all$medievanor1)
+summary(kesky_all$skola_nummer)
+kesky_all$skola_nummer <- as.factor(kesky_all$skola_nummer)
+kesky_all <- as.data.frame(kesky_all)
+```
+So far so good: got the data into a data frame and it looks pretty solid. Above I checked out some of the variables and converted one from integer to categorical (school number). In order to protect the identities of students' and schools I'd removed the school labels prior to importing the data, so R naturlly thought it was a continuous variable. 
+
+Before I can start analyzing I still need to wrangle the data a bit. As stated above, this dataset is not the final complete dataset, and I will dismember it even more. First of all, I've now decided to look only at my most central variables of interest so I'll remove many of the ones I'd kept when importing.
+
+```{r}
+names(kesky_all)
+keep <- c("elev_id","elev_kon","arskurs","skola_nummer","klasstorlek","dist_01","dist_02","dist_03","dist_04","imp_05","imp_06","imp_07","imp_08","imp_09","imp_10","imp_11","imp_12","imp_13","moto_14","moto_15","moto_16","moto_17","moto_18","moto_19","moto_20","rikt_21","rikt_22","rikt_23","rikt_24","rikt_25","uppr_26","uppr_27","uppr_28","uppr_29","uppr_30","uppr_31","skif_32","skif_33","skif_34","skif_35","efig_36","efig_37","efig_38","efig_39","efig_40","efig_sum","efpl_41","efpl_42","efpl_43","efpl_44","efutf_45","efutf_46","efutf_47","efutf_48","efutf_49","efutf_50","efutf_51","efutf_52","efutv_53","efutv_54","efutv_55","starka_sum","inlarningssvarigheter","stadatgarder","ped_bed","ped_utr","paverkar","beteende","anstranga","vitsord_ma","vitsord_mo","utb_grund_mamma","utb_grund_pappa","utb_pabygg_mamma","utb_pabygg_pappa","gatt_om_arskurs","skolform","medicinering","barn_sprak","medievanor1","medievanor2","medievanor3","hur_ofta_lasbarn1","hur_ofta_lasbarn2","hur_ofta_lasbarn3","hur_ofta_lasbarn4","hur_ofta_lasbarn5","hur_ofta_lasbarn6","hur_ofta_lasbarn7","hur_garna_lasbarn1","hur_garna_lasbarn2","hur_garna_lasbarn3","hur_garna_lasbarn4","hur_garna_lasbarn5","hur_garna_lasbarn6","hur_garna_lasbarn7","hur_manga_bocker1","hur_manga_bocker2","borjade_lasforbarn")
+
+kesky_shrt <- dplyr::select(kesky_all, one_of(keep))
+names(kesky_shrt)
+dim(kesky_shrt)
+str(kesky_shrt)
+```
+Whew, that took a bit of searching on the internet. Could not get the dplyr::select()-command to work at first, thought it was the MASS-conflict messing about. However, it turned out that I simply had to use the function as.data.frame() on my imported data before select could actually use the data. Now that I've got my dataset working I still need to mutate around a bit. But first I'll do a listwise deletion just to make it easier to operate on the data. In the final analyses I will probably be imputing some of the variables.
+
+```{r}
+complete.cases(kesky_shrt)
+summary(kesky_shrt)
+```
+
+
+For now, I have too many variables describing SES, reading habits and reading preferences. I want to aggregate these so I have one variable describing each phenomenon. To do this I'll simply create sum variables. The SES will consist of the mothers and fathers highest education level summed. Similarly, reading habits and preferences will be summed over different categories of litterature. This is going to take some wrangling. First I'll check the number of the first column of the variables at hand
+
+```{r}
+which(names(kesky_shrt)%in%c("hur_garna_lasbarn7", "hur_ofta_lasbarn1"))
+```
+
+Then I'll have a look at some of these and then set up a loop to convert all these to numeric:
+```{r}
+summary(kesky_shrt$hur_ofta_lasbarn1)
+for(i in 83:96) {
+  kesky_shrt[[i]] <- as.numeric(kesky_shrt[[i]])
+print(summary(kesky_shrt[[i]]))
+  } 
+```
+
+And last I'll sum these columns:
+```{r}
+kesky_shrt$las_habit  <- rowSums(kesky_shrt[,83:89], na.rm=FALSE)
+kesky_shrt$las_habit
+summary(kesky_shrt$las_habit)
+
+kesky_shrt$las_pref  <- rowSums(kesky_shrt[,90:96], na.rm=FALSE)
+kesky_shrt$las_pref
+summary(kesky_shrt$las_pref)
+```
+Then I'll do the same for the education level:
+
+```{r}
+which(names(kesky_shrt)%in%c("utb_pabygg_mamma", "utb_pabygg_pappa"))
+for(i in 74:75) {
+  kesky_shrt[[i]] <- as.numeric(kesky_shrt[[i]])
+print(summary(kesky_shrt[[i]]))
+}
+kesky_shrt$SES  <- rowSums(kesky_shrt[,74:75], na.rm=FALSE)
+kesky_shrt$SES
+summary(kesky_shrt$SES)
+```
+Now I'll get rid of the redundant variables:
+
+
+<!--
+Getting rid of NA's:
+complete.cases(human)
+
+# print out the data along with a completeness indicator as the last column
+data.frame(human[-1], comp = complete.cases(human))
+
+# filter out all rows with NA values
+human_ <- filter(human, complete.cases(human) == TRUE)
+human_
+-->
 ## Data Description
+
+The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. 
 
 ## Descriptives
 
