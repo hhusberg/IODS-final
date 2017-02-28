@@ -34,42 +34,43 @@ Read the data from SPSS-generated csv-file. I've wrangled the data quite a bit (
 
 ## Data Description
 
-The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. After wrangling around I've got his datafile to work with:
+The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. After wrangling around I've got this datafile to work with. I've decided to go all continuous with this dataset. Most variables are measured on a Likert-type scale with ranges varying from 3 to 7.
 
 ```{r}
 setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
-kesky <- read.csv2(file = "./data/final.csv")
+kesky <- read.csv2(file = "./data/final_cont.csv")
 dim(kesky)
 str(kesky)
+str(kesky$hur_garna_lasbarn1)
 ```
 
 
-### Attention & executive function: measured by a 55-item questionnaire (variables 6-61)
+### Attention & executive function: measured by a 55-item questionnaire (variables 2-56)
 
 ```{r}
 which(names(kesky)%in%c("dist_01", "efutv_55"))
-summary(kesky[, 2:57])
+summary(kesky[, 2:56])
 ```
 
-### School achievement: mesured by 2 questions (math/Swedish grade) (variables 63-64)
+### School achievement: mesured by 2 questions (math/Swedish grade) (variables 57-58)
 
 ```{r}
 which(names(kesky)%in%c("vitsord_ma", "vitsord_mo"))
-summary(kesky[, 58:59])
+summary(kesky[, 57:58])
 ```
 
-### Media time: Measured by 3-item questionnaire (variables 71-73)
+### Media time: Measured by 3-item questionnaire (variables 61-63)
 
 ```{r}
 which(names(kesky)%in%c("medievanor1", "medievanor3"))
-summary(kesky[, 62:64])
+summary(kesky[, 61:63])
 ```
 
 ### Reading preferences: Measured by 7 questions (variables 74-80) and Reading habits: Measured by 7 questions (variables 81-87)
 
 ```{r}
 which(names(kesky)%in%c("hur_garna_lasbarn7", "hur_ofta_lasbarn1"))
-summary(kesky[, 65:78])
+summary(kesky[, 64:77])
 ```
 
 
@@ -77,18 +78,147 @@ summary(kesky[, 65:78])
 
 ```{r}
 which(names(kesky)%in%c("utb_pabygg_mamma", "utb_pabygg_pappa"))
-summary(kesky[, 60:61])
+summary(kesky[, 59:60])
 
 which(names(kesky)%in%c("elev_kon"))
 summary(kesky[, 1])
 ```
 
-## Descriptives
-
-Now we'll take a look at these variables to get some of idea of how they are related. 
 
 ## Method
 
+
+
+
 ## Results
+
+First of all I want to reduce the amount of variables measuring attention. This data with 55 variables is very unyieldy. I'll start by  exploring the patterns of this data. 
+
+```{r}
+#First I'll make a dataframe with only the ATTEX variables:
+kesky_only <- kesky[, 2:56]
+summary(kesky_only)
+str(kesky_only)
+pca_kesky <- prcomp(kesky_only)
+s <- summary(pca_kesky)
+s
+
+# rounded percetanges of variance captured by each PC
+pca_pr <- round(100*s$importance[2, ], digits = 1)
+
+# print out the percentages of variance
+pca_pr
+
+# create object pc_lab to be used as axis labels
+pc_lab <- paste0(names(pca_pr), " (", pca_pr, "%)")
+pc_lab[1:10]
+
+# draw a biplot
+biplot(pca_kesky, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
+```
+
+Unfortunaltely there's no really visible pattern here. Possibly it could be discerned that motor restlessness and some of the executive components load a bit more on PC2 (negative motor restlessness, positiv executive function) and most of the others load more on PC1. This does however not help us in reducing the dimension without losing most of the theoretical sense of the questionnaire.
+
+Luckily, I've also prepared a dataset with sum scores of the items grouped under separate constructs in the questionnaire. Lets look at that:
+
+```{r}
+setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
+kesky_sums <- read.csv2(file = "./data/final_sums.csv")
+kesky_sums <- as.data.frame(kesky_sums)
+kesky_sums[23:32]
+dim(kesky_sums)
+head(kesky_sums)
+
+sums_pca <- prcomp(kesky_sums[23:32])
+s2 <- summary(sums_pca)
+pca2_pr <- round(100*s2$importance[2, ], digits = 1)
+pca2_pr
+
+pc_lab <- paste0(names(pca2_pr), " (", pca2_pr, "%)")
+pc_lab[1:10]
+biplot(sums_pca, cex = c(0.3, 0.8), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
+```
+
+Naturally this looks much the same as the previous biplot but it's alot easier to read. Two components would explain almost 85% of the variance. However, all variables seem to be quite closely related since all arrows point somewhat in the same direction. Potentially one could separate one component having more to do with restlessness and impulsiveness (_moto_ and _imp_ in the biplot) and one component having more to do with maintaining and directing attention as well as executive funtions (_uppr_, _rikt_, _efig_ and _efutf_).
+
+It looks like I might be just as well of using a single summed up variable for the attention questionnaire. Luckily I anticipated this and have already created that sum variable in my dataframe. I'll go ahead and make a newdataframe without the lower level summed variables. At the same time I'll take the means of the reading variables:
+
+```{r}
+library(dplyr)
+summary(kesky_sums$attention)
+
+remove <- names(kesky_sums[23:32])
+kesky_one <- dplyr::select(kesky_sums, -one_of(remove))
+summary(kesky_one)
+
+names(kesky_one)
+read_habs_columns <- kesky_one[9:15]
+head(read_habs_columns)
+kesky_one$read_habs <- rowSums(read_habs_columns) 
+summary(kesky_one$read_habs)
+summary(kesky_one)
+
+read_pref_columns <- kesky_one[16:22]
+head(read_pref_columns)
+kesky_one$read_pref <- rowSums(read_pref_columns) 
+summary(kesky_one$read_pref)
+summary(kesky_one)
+
+names(kesky_one)
+remove2 <- names(kesky_one[9:22])
+remove2
+kesky_one <- dplyr::select(kesky_one, -one_of(remove2))
+summary(kesky_one)
+
+```
+
+
+Now as stated before, I'm interested in seeing how media usage is connected with attention at school and school achievement. I'll start off by eyeballing my data and then doing a corrplot of the variables that interest me: 
+
+```{r}
+library(GGally)
+library(ggplot2)
+p <- ggpairs(kesky_one, mapping = aes(col = elev_kon, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)))
+p
+
+library(corrplot)
+str(kesky_one)
+kesky_one$elev_kon
+levels(kesky_one$elev_kon) <-c(1,2)
+levels(kesky_one$elev_kon)
+as.numeric(levels(kesky_one$elev_kon))
+kesky_one$elev_kon <- as.numeric(kesky_one$elev_kon)
+kesky_one$elev_kon
+
+
+
+# Correlations:
+cor_matrix <- cor(kesky_one) %>% round(digits = 2)
+cor_matrix
+corrplot(cor_matrix, method="ellipse", type="upper", cl.pos="b", tl.pos="d", tl.cex=0.6)
+```
+
+Based on this correlation plot, it does not seem like children's media time has any significant effect on either their attention at shool, their school achievement or their reading habits.
+
+Next I'll conduct regression analyses using first attention then school achievement as target variables:
+
+```{r}
+kesky_lm <- lm(attention ~ medievanor1 + medievanor2 + medievanor3 + read_habs + read_pref, data = kesky_one)
+summary(kesky_lm)
+
+kesky_lm2 <- lm(vitsord_ma ~ medievanor1 + medievanor2 + medievanor3 + read_habs + read_pref, data = kesky_one)
+summary(kesky_lm2)
+
+kesky_lm3 <- lm(vitsord_mo ~ medievanor1 + medievanor2 + medievanor3 + read_habs + read_pref, data = kesky_one)
+summary(kesky_lm3)
+
+kesky_lm4 <- lm(read_pref ~ medievanor1 + medievanor2 + medievanor3, data = kesky_one)
+summary(kesky_lm4)
+
+kesky_lm5 <- lm(read_habs ~ medievanor1 + medievanor2 + medievanor3, data = kesky_one)
+summary(kesky_lm5)
+
+
+```
 
 ## Discussion

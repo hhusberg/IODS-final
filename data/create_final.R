@@ -12,14 +12,23 @@
 library(dplyr)
 library(memisc)
 setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
-kesky_all <- as.data.set(spss.system.file("./data/Kesky_luvat_final_tausta_very_short_1.sav"))
+kesky_all <- as.data.set(spss.system.file("./data/Kesky_luvat_final_tausta_very_short_3.sav"))
 str(kesky_all)
 summary(kesky_all$utb_grund_mamma)
 summary(kesky_all$medicinering)
 summary(kesky_all$medievanor1)
 summary(kesky_all$skola_nummer)
+summary(kesky_all$hur_garna_lasbarn1)
+summary(kesky_all$hur_ofta_lasbarn1)
 kesky_all$skola_nummer <- as.factor(kesky_all$skola_nummer)
 kesky_all <- as.data.frame(kesky_all)
+str(kesky_all)
+summary(kesky_all$utb_grund_mamma)
+summary(kesky_all$medicinering)
+summary(kesky_all$medievanor1)
+summary(kesky_all$skola_nummer)
+summary(kesky_all$hur_garna_lasbarn1)
+
 
 # So far so good: got the data into a data frame and it looks pretty solid. Above I checked out some of the variables and converted one 
 # from integer to categorical (school number). In order to protect the identities of students' and schools I'd removed the school labels prior to importing the data, so R naturlly thought it was a continuous variable. 
@@ -29,7 +38,7 @@ kesky_all <- as.data.frame(kesky_all)
 # many of the ones I'd kept when importing.
 
 names(kesky_all)
-keep <- c("elev_id","elev_kon","arskurs","skola_nummer","klasstorlek","dist_01","dist_02","dist_03","dist_04","imp_05","imp_06","imp_07","imp_08","imp_09","imp_10","imp_11","imp_12","imp_13","moto_14","moto_15","moto_16","moto_17","moto_18","moto_19","moto_20","rikt_21","rikt_22","rikt_23","rikt_24","rikt_25","uppr_26","uppr_27","uppr_28","uppr_29","uppr_30","uppr_31","skif_32","skif_33","skif_34","skif_35","efig_36","efig_37","efig_38","efig_39","efig_40","efig_sum","efpl_41","efpl_42","efpl_43","efpl_44","efutf_45","efutf_46","efutf_47","efutf_48","efutf_49","efutf_50","efutf_51","efutf_52","efutv_53","efutv_54","efutv_55","beteende","vitsord_ma","vitsord_mo","utb_pabygg_mamma","utb_pabygg_pappa","gatt_om_arskurs","skolform","medicinering","barn_sprak","medievanor1","medievanor2","medievanor3","hur_ofta_lasbarn1","hur_ofta_lasbarn2","hur_ofta_lasbarn3","hur_ofta_lasbarn4","hur_ofta_lasbarn5","hur_ofta_lasbarn6","hur_ofta_lasbarn7","hur_garna_lasbarn1","hur_garna_lasbarn2","hur_garna_lasbarn3","hur_garna_lasbarn4","hur_garna_lasbarn5","hur_garna_lasbarn6","hur_garna_lasbarn7","hur_manga_bocker1","hur_manga_bocker2","borjade_lasforbarn")
+keep <- c("elev_id","elev_kon","arskurs","skola_nummer","klasstorlek","dist_01","dist_02","dist_03","dist_04","imp_05","imp_06","imp_07","imp_08","imp_09","imp_10","imp_11","imp_12","imp_13","moto_14","moto_15","moto_16","moto_17","moto_18","moto_19","moto_20","rikt_21","rikt_22","rikt_23","rikt_24","rikt_25","uppr_26","uppr_27","uppr_28","uppr_29","uppr_30","uppr_31","skif_32","skif_33","skif_34","skif_35","efig_36","efig_37","efig_38","efig_39","efig_40","efpl_41","efpl_42","efpl_43","efpl_44","efutf_45","efutf_46","efutf_47","efutf_48","efutf_49","efutf_50","efutf_51","efutf_52","efutv_53","efutv_54","efutv_55","beteende","vitsord_ma","vitsord_mo","utb_pabygg_mamma","utb_pabygg_pappa","gatt_om_arskurs","skolform","medicinering","barn_sprak","medievanor1","medievanor2","medievanor3","hur_ofta_lasbarn1","hur_ofta_lasbarn2","hur_ofta_lasbarn3","hur_ofta_lasbarn4","hur_ofta_lasbarn5","hur_ofta_lasbarn6","hur_ofta_lasbarn7","hur_garna_lasbarn1","hur_garna_lasbarn2","hur_garna_lasbarn3","hur_garna_lasbarn4","hur_garna_lasbarn5","hur_garna_lasbarn6","hur_garna_lasbarn7","hur_manga_bocker1","hur_manga_bocker2","borjade_lasforbarn")
 
 kesky_shrt <- dplyr::select(kesky_all, one_of(keep))
 names(kesky_shrt)
@@ -54,37 +63,37 @@ summary(kesky_shrt)
 # Attention & executive function: measured by a 55-item questionnaire (variables 6-61)
 
 which(names(kesky_shrt)%in%c("dist_01", "efutv_55"))
-summary(kesky_shrt[, 6:61])
+summary(kesky_shrt[, 6:60])
 
 # School achievement: mesured by 2 questions (math/Swedish grade) (variables 63-64)
 
 which(names(kesky_shrt)%in%c("vitsord_ma", "vitsord_mo"))
-summary(kesky_shrt[, 63:64])
+summary(kesky_shrt[, 62:63])
 
 # Media time: Measured by 3-item questionnaire (variables 71-73)
 
 which(names(kesky_shrt)%in%c("medievanor1", "medievanor3"))
-summary(kesky_shrt[, 71:73])
+summary(kesky_shrt[, 70:72])
 
 # Reading preferences: Measured by 7 questions (variables 74-80)
 # Reading habits: Measured by 7 questions (variables 81-87)
 
 
 which(names(kesky_shrt)%in%c("hur_garna_lasbarn7", "hur_ofta_lasbarn1"))
-summary(kesky_shrt[, 74:87])
+summary(kesky_shrt[, 73:86])
 
 
 # While controlling for SES: Here measured by parents' highest educational level (variables 65-66) and gender: (variable 2)
 
 which(names(kesky_shrt)%in%c("utb_pabygg_mamma", "utb_pabygg_pappa"))
-summary(kesky_shrt[, 65:66])
+summary(kesky_shrt[, 64:65])
 
 which(names(kesky_shrt)%in%c("elev_kon"))
 summary(kesky_shrt[, 2])
 
 # There's a few more variables that I want to keep around for now, but I'll start by subsetting these and checking missing values:
 
-kesky_subset <- kesky_shrt[c(2, 6:61, 63:64, 65:66, 71:73, 74:87)]
+kesky_subset <- kesky_shrt[c(2, 6:60, 62:63, 64:65, 70:72, 73:86)]
 names(kesky_subset)
 dim(kesky_subset)
 complete.cases(kesky_subset)
@@ -104,14 +113,92 @@ complete.cases(kesky_listwise)
 # Right, so now I have a dataset containing my variables of interest and with no missing values. I've lost a lot of 
 # information compared to my original dataet of 522 cases, but I won't have to battle the NA:s.
 
+# Next I'll create sum variables of the different variables of the 10 separate dimensions of attention hypothesized in the questionnaire 
+summary(kesky_listwise)
+
+dist_columns <- kesky_listwise[2:5]
+head(dist_columns)
+kesky_listwise$dist <- rowSums(dist_columns)
+kesky_listwise$dist
+
+imp_columns <- kesky_listwise[6:14]
+head(imp_columns)
+kesky_listwise$imp <- rowSums(imp_columns)
+kesky_listwise$imp
+
+moto_columns <- kesky_listwise[15:21]
+head(moto_columns)
+kesky_listwise$moto <- rowSums(moto_columns)
+kesky_listwise$moto
+
+rikt_columns <- kesky_listwise[22:26]
+head(rikt_columns)
+kesky_listwise$rikt <- rowSums(rikt_columns)
+kesky_listwise$rikt
+
+uppr_columns <- kesky_listwise[27:32]
+head(uppr_columns)
+kesky_listwise$uppr <- rowSums(uppr_columns)
+kesky_listwise$uppr
+
+skif_columns <- kesky_listwise[33:36]
+head(skif_columns)
+kesky_listwise$skif <- rowSums(skif_columns)
+kesky_listwise$skif
+
+efig_columns <- kesky_listwise[37:41]
+head(efig_columns)
+kesky_listwise$efig <- rowSums(efig_columns)
+kesky_listwise$efig
+
+efpl_columns <- kesky_listwise[42:45]
+head(efpl_columns)
+kesky_listwise$efpl <- rowSums(efpl_columns)
+kesky_listwise$efpl
+
+efutf_columns <- kesky_listwise[46:53]
+head(efutf_columns)
+kesky_listwise$efutf <- rowSums(efutf_columns)
+kesky_listwise$efutf
+
+efutv_columns <- kesky_listwise[54:56]
+head(efutv_columns)
+kesky_listwise$efutv <- rowSums(efutv_columns)
+kesky_listwise$efutv
+
+summary(kesky_listwise)
+str(kesky_listwise)
+dim(kesky_listwise)
+
+# Because on viable way of using the questionnaire data is a single sum variable, I'll go ahead and create a dataframe for that as well:
+
+attention_columns <- kesky_listwise[2:56]
+head(attention_columns)
+kesky_listwise$attention <- rowSums(attention_columns) 
+summary(kesky_listwise$attention)
+
+remove <- names(kesky_listwise[2:56])
+remove
+library(dplyr)
+kesky_sums <- dplyr::select(kesky_listwise, -one_of(remove))
+str(kesky_sums)
+
+
+
+
 # I'll save this as my new datafile and use it for my final assignment. All other files will be removed.
 dim(kesky_listwise)
 head(kesky_listwise)
-write.csv2(kesky_listwise, file = "./data/final.csv", row.names = FALSE)
-kesky_read <- read.csv2(file = "./data/final.csv")
+write.csv2(kesky_listwise, file = "./data/final_cont.csv", row.names = FALSE)
+write.csv2(kesky_sums, file = "./data/final_sums.csv", row.names=FALSE)
+kesky_read <- read.csv2(file = "./data/final_cont.csv")
+sums_read <- read.csv2(file="./data/final_sums.csv")
 dim(kesky_read)
 head(kesky_read)
+dim(sums_read)
+head(sums_read)
 library(compare)
+compare(kesky_sums, sums_read)
 compare(kesky_listwise, kesky_read)
 
 # Why are they not the same? Beats me...
