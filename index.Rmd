@@ -265,9 +265,19 @@ So a ten factor model does not work very well, the fit indexes are close to abys
 ```{r}
 kesky.model2 <- ' attention =~ dist_01 + dist_02 + dist_03 + dist_04 + imp_05 + imp_06 + imp_07 + imp_08 + imp_09 + imp_10 + imp_11 + imp_12 + imp_13 + moto_14 + moto_15 + moto_16 + moto_17 + moto_18 + moto_19 + moto_20 + rikt_21 + rikt_22 + rikt_23 + rikt_24 + rikt_25 + uppr_26 + uppr_27 + uppr_28 + uppr_29 + uppr_30 + uppr_31 + skif_32 + skif_33 + skif_34 + skif_35 + efig_36 + efig_37 + efig_38 + efig_39 + efig_40 + efpl_41 + efpl_42 + efpl_43 + efpl_44 + efutf_45 + efutf_46 + efutf_47 + efutf_48 + efutf_49 + efutf_50 + efutf_51 + efutf_52 + efutv_53 + efutv_54 + efutv_55 '
 
-fit <- cfa(kesky.model2, data = kesky)
-cfasum <- summary(fit, fit.measures = TRUE)
+fit2 <- cfa(kesky.model2, data = kesky)
+cfasum <- summary(fit2, fit.measures = TRUE)
 ```
+Even worse. Now I'll create latent variables for the reading habits and reading preferences:
 
+```{r}
+names(kesky)
+#summary(kesky)
+reading.model <- ' readhabs =~ hur_ofta_lasbarn1 + hur_ofta_lasbarn2 + hur_ofta_lasbarn3 + hur_ofta_lasbarn4 + hur_ofta_lasbarn5 + hur_ofta_lasbarn6 + hur_ofta_lasbarn7
+readpref =~ hur_garna_lasbarn1 + hur_garna_lasbarn2 + hur_garna_lasbarn3 + hur_garna_lasbarn4 + hur_garna_lasbarn5 + hur_garna_lasbarn6 + hur_garna_lasbarn7 '
+
+fit3 <- cfa(reading.model, data = kesky)
+cfaread <- summary(fit3, fit.measures = TRUE)
+```
 
 ## Discussion

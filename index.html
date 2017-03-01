@@ -858,8 +858,8 @@ fit &lt;- cfa(kesky.model, data = kesky)</code></pre>
 <p>So a ten factor model does not work very well, the fit indexes are close to abysmal. We’ll have a look at a one-factor model next:</p>
 <pre class="r"><code>kesky.model2 &lt;- ' attention =~ dist_01 + dist_02 + dist_03 + dist_04 + imp_05 + imp_06 + imp_07 + imp_08 + imp_09 + imp_10 + imp_11 + imp_12 + imp_13 + moto_14 + moto_15 + moto_16 + moto_17 + moto_18 + moto_19 + moto_20 + rikt_21 + rikt_22 + rikt_23 + rikt_24 + rikt_25 + uppr_26 + uppr_27 + uppr_28 + uppr_29 + uppr_30 + uppr_31 + skif_32 + skif_33 + skif_34 + skif_35 + efig_36 + efig_37 + efig_38 + efig_39 + efig_40 + efpl_41 + efpl_42 + efpl_43 + efpl_44 + efutf_45 + efutf_46 + efutf_47 + efutf_48 + efutf_49 + efutf_50 + efutf_51 + efutf_52 + efutv_53 + efutv_54 + efutv_55 '
 
-fit &lt;- cfa(kesky.model2, data = kesky)
-cfasum &lt;- summary(fit, fit.measures = TRUE)</code></pre>
+fit2 &lt;- cfa(kesky.model2, data = kesky)
+cfasum &lt;- summary(fit2, fit.measures = TRUE)</code></pre>
 <pre><code>## lavaan (0.5-23.1097) converged normally after 103 iterations
 ## 
 ##   Number of observations                           192
@@ -1022,6 +1022,131 @@ cfasum &lt;- summary(fit, fit.measures = TRUE)</code></pre>
 ##    .efutv_54          0.101    0.011    9.590    0.000
 ##    .efutv_55          0.102    0.011    9.635    0.000
 ##     attention         0.247    0.037    6.679    0.000</code></pre>
+<p>Even worse. Now I’ll create latent variables for the reading habits and reading preferences:</p>
+<pre class="r"><code>names(kesky)</code></pre>
+<pre><code>##  [1] &quot;elev_kon&quot;           &quot;dist_01&quot;            &quot;dist_02&quot;           
+##  [4] &quot;dist_03&quot;            &quot;dist_04&quot;            &quot;imp_05&quot;            
+##  [7] &quot;imp_06&quot;             &quot;imp_07&quot;             &quot;imp_08&quot;            
+## [10] &quot;imp_09&quot;             &quot;imp_10&quot;             &quot;imp_11&quot;            
+## [13] &quot;imp_12&quot;             &quot;imp_13&quot;             &quot;moto_14&quot;           
+## [16] &quot;moto_15&quot;            &quot;moto_16&quot;            &quot;moto_17&quot;           
+## [19] &quot;moto_18&quot;            &quot;moto_19&quot;            &quot;moto_20&quot;           
+## [22] &quot;rikt_21&quot;            &quot;rikt_22&quot;            &quot;rikt_23&quot;           
+## [25] &quot;rikt_24&quot;            &quot;rikt_25&quot;            &quot;uppr_26&quot;           
+## [28] &quot;uppr_27&quot;            &quot;uppr_28&quot;            &quot;uppr_29&quot;           
+## [31] &quot;uppr_30&quot;            &quot;uppr_31&quot;            &quot;skif_32&quot;           
+## [34] &quot;skif_33&quot;            &quot;skif_34&quot;            &quot;skif_35&quot;           
+## [37] &quot;efig_36&quot;            &quot;efig_37&quot;            &quot;efig_38&quot;           
+## [40] &quot;efig_39&quot;            &quot;efig_40&quot;            &quot;efpl_41&quot;           
+## [43] &quot;efpl_42&quot;            &quot;efpl_43&quot;            &quot;efpl_44&quot;           
+## [46] &quot;efutf_45&quot;           &quot;efutf_46&quot;           &quot;efutf_47&quot;          
+## [49] &quot;efutf_48&quot;           &quot;efutf_49&quot;           &quot;efutf_50&quot;          
+## [52] &quot;efutf_51&quot;           &quot;efutf_52&quot;           &quot;efutv_53&quot;          
+## [55] &quot;efutv_54&quot;           &quot;efutv_55&quot;           &quot;vitsord_ma&quot;        
+## [58] &quot;vitsord_mo&quot;         &quot;utb_pabygg_mamma&quot;   &quot;utb_pabygg_pappa&quot;  
+## [61] &quot;medievanor1&quot;        &quot;medievanor2&quot;        &quot;medievanor3&quot;       
+## [64] &quot;hur_ofta_lasbarn1&quot;  &quot;hur_ofta_lasbarn2&quot;  &quot;hur_ofta_lasbarn3&quot; 
+## [67] &quot;hur_ofta_lasbarn4&quot;  &quot;hur_ofta_lasbarn5&quot;  &quot;hur_ofta_lasbarn6&quot; 
+## [70] &quot;hur_ofta_lasbarn7&quot;  &quot;hur_garna_lasbarn1&quot; &quot;hur_garna_lasbarn2&quot;
+## [73] &quot;hur_garna_lasbarn3&quot; &quot;hur_garna_lasbarn4&quot; &quot;hur_garna_lasbarn5&quot;
+## [76] &quot;hur_garna_lasbarn6&quot; &quot;hur_garna_lasbarn7&quot; &quot;dist&quot;              
+## [79] &quot;imp&quot;                &quot;uppr&quot;               &quot;moto&quot;              
+## [82] &quot;rikt&quot;               &quot;skif&quot;               &quot;efig&quot;              
+## [85] &quot;efpl&quot;               &quot;efutf&quot;              &quot;efutv&quot;             
+## [88] &quot;attention&quot;</code></pre>
+<pre class="r"><code>#summary(kesky)
+reading.model &lt;- ' readhabs =~ hur_ofta_lasbarn1 + hur_ofta_lasbarn2 + hur_ofta_lasbarn3 + hur_ofta_lasbarn4 + hur_ofta_lasbarn5 + hur_ofta_lasbarn6 + hur_ofta_lasbarn7
+readpref =~ hur_garna_lasbarn1 + hur_garna_lasbarn2 + hur_garna_lasbarn3 + hur_garna_lasbarn4 + hur_garna_lasbarn5 + hur_garna_lasbarn6 + hur_garna_lasbarn7 '
+
+fit3 &lt;- cfa(reading.model, data = kesky)
+cfaread &lt;- summary(fit3, fit.measures = TRUE)</code></pre>
+<pre><code>## lavaan (0.5-23.1097) converged normally after 127 iterations
+## 
+##   Number of observations                           192
+## 
+##   Estimator                                         ML
+##   Minimum Function Test Statistic              784.984
+##   Degrees of freedom                                76
+##   P-value (Chi-square)                           0.000
+## 
+## Model test baseline model:
+## 
+##   Minimum Function Test Statistic             1447.073
+##   Degrees of freedom                                91
+##   P-value                                        0.000
+## 
+## User model versus baseline model:
+## 
+##   Comparative Fit Index (CFI)                    0.477
+##   Tucker-Lewis Index (TLI)                       0.374
+## 
+## Loglikelihood and Information Criteria:
+## 
+##   Loglikelihood user model (H0)              -4653.638
+##   Loglikelihood unrestricted model (H1)      -4261.146
+## 
+##   Number of free parameters                         29
+##   Akaike (AIC)                                9365.276
+##   Bayesian (BIC)                              9459.743
+##   Sample-size adjusted Bayesian (BIC)         9367.880
+## 
+## Root Mean Square Error of Approximation:
+## 
+##   RMSEA                                          0.220
+##   90 Percent Confidence Interval          0.207  0.235
+##   P-value RMSEA &lt;= 0.05                          0.000
+## 
+## Standardized Root Mean Square Residual:
+## 
+##   SRMR                                           0.133
+## 
+## Parameter Estimates:
+## 
+##   Information                                 Expected
+##   Standard Errors                             Standard
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   readhabs =~                                         
+##     hur_oft_lsbrn1    1.000                           
+##     hur_oft_lsbrn2    6.373    7.448    0.856    0.392
+##     hur_oft_lsbrn3   10.113   11.725    0.863    0.388
+##     hur_oft_lsbrn4    8.648   10.010    0.864    0.388
+##     hur_oft_lsbrn5    7.488    8.744    0.856    0.392
+##     hur_oft_lsbrn6    9.283   10.736    0.865    0.387
+##     hur_oft_lsbrn7    7.612    8.893    0.856    0.392
+##   readpref =~                                         
+##     hur_grn_lsbrn1    1.000                           
+##     hur_grn_lsbrn2    1.642    0.334    4.916    0.000
+##     hur_grn_lsbrn3    1.898    0.371    5.120    0.000
+##     hur_grn_lsbrn4    2.130    0.397    5.368    0.000
+##     hur_grn_lsbrn5    1.463    0.320    4.579    0.000
+##     hur_grn_lsbrn6    2.608    0.460    5.667    0.000
+##     hur_grn_lsbrn7    1.862    0.373    4.987    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   readhabs ~~                                         
+##     readpref          0.046    0.054    0.854    0.393
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##    .hur_oft_lsbrn1    1.130    0.115    9.789    0.000
+##    .hur_oft_lsbrn2    1.206    0.128    9.453    0.000
+##    .hur_oft_lsbrn3    1.167    0.132    8.875    0.000
+##    .hur_oft_lsbrn4    0.565    0.068    8.369    0.000
+##    .hur_oft_lsbrn5    1.575    0.167    9.433    0.000
+##    .hur_oft_lsbrn6    0.496    0.063    7.872    0.000
+##    .hur_oft_lsbrn7    1.690    0.179    9.447    0.000
+##    .hur_grn_lsbrn1    2.397    0.251    9.550    0.000
+##    .hur_grn_lsbrn2    2.764    0.300    9.211    0.000
+##    .hur_grn_lsbrn3    2.715    0.302    8.995    0.000
+##    .hur_grn_lsbrn4    2.113    0.249    8.477    0.000
+##    .hur_grn_lsbrn5    3.322    0.353    9.413    0.000
+##    .hur_grn_lsbrn6    0.978    0.176    5.559    0.000
+##    .hur_grn_lsbrn7    3.213    0.351    9.148    0.000
+##     readhabs          0.005    0.012    0.433    0.665
+##     readpref          0.488    0.173    2.817    0.005</code></pre>
 </div>
 <div id="discussion" class="section level2">
 <h2>Discussion</h2>
