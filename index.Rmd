@@ -39,8 +39,8 @@ Read the data from SPSS-generated csv-file. I've wrangled the data quite a bit (
 The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. After wrangling around I've got this datafile to work with. I've decided to go all continuous with this dataset. Most variables are measured on a Likert-type scale with ranges varying from 3 to 7.
 
 ```{r}
-#setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
-setwd("C:/Users/hhusberg/Documents/GitHub/IODS-final")
+setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
+#setwd("C:/Users/hhusberg/Documents/GitHub/IODS-final")
 kesky <- read.csv2(file = "./data/final_cont.csv")
 dim(kesky)
 #str(kesky)
@@ -126,8 +126,8 @@ Unfortunaltely there's no really visible pattern here. Possibly it could be disc
 Luckily, I've also prepared a dataset with sum scores of the items grouped under separate constructs in the questionnaire. Lets look at that:
 
 ```{r}
-#setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
-setwd("C:/Users/hhusberg/Documents/GitHub/IODS-final")
+setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
+#setwd("C:/Users/hhusberg/Documents/GitHub/IODS-final")
 
 kesky_sums <- read.csv2(file = "./data/final_sums.csv")
 kesky_sums <- as.data.frame(kesky_sums)
@@ -257,8 +257,8 @@ efutf_l =~ efutf_45 + efutf_46 + efutf_47 + efutf_48 + efutf_49 + efutf_50 + efu
 efutv_l =~ efutv_53 + efutv_54 + efutv_55 '
 
 fit <- cfa(kesky.model, data = kesky)
-cfasum <- summary(fit, fit.measures = TRUE)
-cfasum
+cfaten <- summary(fit, fit.measures = TRUE, standardized = TRUE)
+cfaten
 ```
 So a ten factor model does not work very well, the fit indexes are close to abysmal. We'll have a look at a one-factor model next:
 
@@ -266,9 +266,23 @@ So a ten factor model does not work very well, the fit indexes are close to abys
 kesky.model2 <- ' attention =~ dist_01 + dist_02 + dist_03 + dist_04 + imp_05 + imp_06 + imp_07 + imp_08 + imp_09 + imp_10 + imp_11 + imp_12 + imp_13 + moto_14 + moto_15 + moto_16 + moto_17 + moto_18 + moto_19 + moto_20 + rikt_21 + rikt_22 + rikt_23 + rikt_24 + rikt_25 + uppr_26 + uppr_27 + uppr_28 + uppr_29 + uppr_30 + uppr_31 + skif_32 + skif_33 + skif_34 + skif_35 + efig_36 + efig_37 + efig_38 + efig_39 + efig_40 + efpl_41 + efpl_42 + efpl_43 + efpl_44 + efutf_45 + efutf_46 + efutf_47 + efutf_48 + efutf_49 + efutf_50 + efutf_51 + efutf_52 + efutv_53 + efutv_54 + efutv_55 '
 
 fit2 <- cfa(kesky.model2, data = kesky)
-cfasum <- summary(fit2, fit.measures = TRUE)
+cfaone <- summary(fit2, fit.measures = TRUE, standardized = TRUE)
 ```
-Even worse. Now I'll create latent variables for the reading habits and reading preferences:
+Even worse. 
+
+Based on the PCA above it seemed that motor restlesness and impulsivity could form a factor of their own, so next I'll try a three factor solution:
+
+```{r}
+kesky.model3 <- ' motoimp =~ imp_05 + imp_06 + imp_07 + imp_08 + imp_09 + imp_10 + imp_11 + imp_12 + imp_13 + moto_14 + moto_15 + moto_16 + moto_17 + moto_18 + moto_19 + moto_20 
+uppmef =~ rikt_21 + rikt_22 + rikt_23 + rikt_24 + rikt_25 + uppr_26 + uppr_27 + uppr_28 + uppr_29 + uppr_30 + uppr_31 + efig_36 + efig_37 + efig_38 + efig_39 + efutf_45 + efutf_46 + efutf_47 + efutf_48 + efutf_49 + efutf_50 + efutf_51 + efutf_52
+therest =~ skif_32 + skif_33 + skif_34 + skif_35 + dist_01 + dist_02 + dist_03 + dist_04 + efig_40 + efpl_41 + efpl_42 + efpl_43 + efpl_44  + efutv_53 + efutv_54 + efutv_55 '
+
+fit3 <- cfa(kesky.model3, data=kesky)
+cfathree <- summary(fit3, fit.measures=TRUE, standardized=TRUE)
+```
+
+
+Now I'll create latent variables for the reading habits and reading preferences:
 
 ```{r}
 names(kesky)
@@ -276,8 +290,49 @@ names(kesky)
 reading.model <- ' readhabs =~ hur_ofta_lasbarn1 + hur_ofta_lasbarn2 + hur_ofta_lasbarn3 + hur_ofta_lasbarn4 + hur_ofta_lasbarn5 + hur_ofta_lasbarn6 + hur_ofta_lasbarn7
 readpref =~ hur_garna_lasbarn1 + hur_garna_lasbarn2 + hur_garna_lasbarn3 + hur_garna_lasbarn4 + hur_garna_lasbarn5 + hur_garna_lasbarn6 + hur_garna_lasbarn7 '
 
-fit3 <- cfa(reading.model, data = kesky)
-cfaread <- summary(fit3, fit.measures = TRUE)
+fit4 <- cfa(reading.model, data = kesky)
+cfaread <- summary(fit4, fit.measures = TRUE, standardized = TRUE)
+
+#Plot it:
+library(semPlot)
+semPaths(fit4, what="std", label.cex=1.5, edge.label.cex=1.3)
+text(0.9,0.9,labels="CFA for reading habits and preferences")
+```
+
+This model did not work out at all. However, when we look at the questions more closely we see that reading questions 1 and 2 are related to homework (Swedish/other homework), while questions 3 and 5 are related to literature (books/comics). A theoretically more sound model would be one that assumes that habits and preferences for these two categories of reading (homework/leisure) are separate. Therefore we'll look at a four factor model next:
+```{r}
+
+reading.model2 <- ' rdhabhw =~ hur_ofta_lasbarn1 + hur_ofta_lasbarn2 
+rdhablit =~ hur_ofta_lasbarn3 + hur_ofta_lasbarn5
+rdprhw =~ hur_garna_lasbarn1 + hur_garna_lasbarn2 
+rdprlit =~ hur_garna_lasbarn3 + hur_garna_lasbarn5 '
+
+fit5 <- cfa(reading.model2, data = kesky)
+cfaread2 <- summary(fit5, fit.measures = TRUE, standardized = TRUE)
+
+#Plot it:
+library(semPlot)
+semPaths(fit5, what="std", label.cex=1.5, edge.label.cex=1.3)
+text(0.9,0.9,labels="CFA for reading habits and preferences")
+```
+
+
+
+Because this data does not lend itself to a latent variable approach, I'll conduct patha analyses using manitfest sum variables.
+
+```{r}
+
+pa.model <- ' 
+ach =~ vitsord_ma + vitsord_mo
+
+ach ~ attention + read_pref + read_habs
+attention ~ medievanor1 + medievanor2 + medievanor3
+read_habs ~ medievanor1 + medievanor2 + medievanor3
+read_pref ~ medievanor1 + medievanor2 + medievanor3
+' 
+fit.pa <- sem(pa.model, data=kesky_one) 
+summary(fit.pa, fit.measures=TRUE, standardized=TRUE)
+
 ```
 
 ## Discussion
