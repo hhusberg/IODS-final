@@ -170,7 +170,7 @@ summary(kesky_listwise)
 str(kesky_listwise)
 dim(kesky_listwise)
 
-# Because on viable way of using the questionnaire data is a single sum variable, I'll go ahead and create a dataframe for that as well:
+# Because one viable way of using the questionnaire data is a single sum variable, I'll go ahead and create a dataframe for that as well:
 
 attention_columns <- kesky_listwise[2:56]
 head(attention_columns)
@@ -182,17 +182,53 @@ remove
 library(dplyr)
 kesky_sums <- dplyr::select(kesky_listwise, -one_of(remove))
 str(kesky_sums)
+names(kesky_sums)
+#And I'll remove the reading variables that I'm not interested in and only leave those related to homework (1 and 2) and literature (3 and 5)
 
+remove2 <- c("hur_ofta_lasbarn4", "hur_ofta_lasbarn6", "hur_ofta_lasbarn7", "hur_garna_lasbarn4", "hur_garna_lasbarn6", "hur_garna_lasbarn7")
+remove2
+kesky_sums <- dplyr::select(kesky_sums, -one_of(remove2))
+names(kesky_sums)
 
+# Last, I'll take the means  for homework related reading and leisure related reading, then remove the original variables:
 
+kesky_sums$rd_hab_hw <- rowMeans(kesky_sums[9:10]) 
+kesky_sums$rd_hab_hw
 
-# I'll save this as my new datafile and use it for my final assignment. All other files will be removed.
+kesky_sums$rd_hab_ls <- rowMeans(kesky_sums[11:12]) 
+kesky_sums$rd_hab_ls
+
+kesky_sums$rd_pre_hw <- rowMeans(kesky_sums[13:14]) 
+kesky_sums$rd_pre_hw
+
+kesky_sums$rd_pre_ls <- rowMeans(kesky_sums[15:16]) 
+kesky_sums$rd_pre_ls
+
+names(kesky_sums)
+
+remove2 <- names(kesky_sums[9:16])
+remove2
+kesky_sums <- dplyr::select(kesky_sums, -one_of(remove2))
+names(kesky_sums)
+
+# And the means for the mothers and fathers education level to form my SES variable, then remove the original variables:
+
+kesky_sums$ses <- rowMeans(kesky_sums[4:5])
+kesky_sums$ses
+
+remove3 <- names(kesky_sums[4:5])
+remove3
+kesky_sums <- dplyr::select(kesky_sums, -one_of(remove3))
+
+names(kesky_sums)
+
+# I'll save this as my new datafiles and use them for my final assignment. All other files will be removed.
 dim(kesky_listwise)
 head(kesky_listwise)
 write.csv2(kesky_listwise, file = "./data/final_cont.csv", row.names = FALSE)
-write.csv2(kesky_sums, file = "./data/final_sums.csv", row.names=FALSE)
+write.csv2(kesky_sums, file = "./data/final_sums_2.csv", row.names=FALSE)
 kesky_read <- read.csv2(file = "./data/final_cont.csv")
-sums_read <- read.csv2(file="./data/final_sums.csv")
+sums_read <- read.csv2(file="./data/final_sums_2.csv")
 dim(kesky_read)
 head(kesky_read)
 dim(sums_read)
@@ -201,4 +237,3 @@ library(compare)
 compare(kesky_sums, sums_read)
 compare(kesky_listwise, kesky_read)
 
-# Why are they not the same? Beats me...
