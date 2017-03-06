@@ -134,9 +134,12 @@ Unfortunaltely there's no really visible pattern here. Possibly it could be disc
 * Executive Functions, executing - 8 questions
 * Exectuive Functions, evaluating - 3 questions
 
-I've prepared a dataset with sum scores of the items grouped under separate constructs in the questionnaire. Lets look at that:
+I've prepared a dataset with sum scores of the items grouped under separate constructs in the questionnaire. Lets look at that.
+
+Now as stated before, I'm interested in seeing how media usage is connected with attention at school and school achievement. I'll start off by eyeballing my data and then doing a corrplot of the variables that interest me. 
 
 ```{r}
+
 setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
 #setwd("C:/Users/hhusberg/Documents/GitHub/IODS-final")
 
@@ -146,6 +149,33 @@ kesky_sums <- as.data.frame(kesky_sums)
 dim(kesky_sums)
 head(kesky_sums)
 names(kesky_sums)
+
+library(GGally)
+library(ggplot2)
+
+library(corrplot)
+library(dplyr)
+names(kesky_sums)
+
+# Need to change the gender variable to numeric to use it in the corrplot:
+
+kesky_sums$elev_kon
+levels(kesky_sums$elev_kon) <-c(1,2)
+levels(kesky_sums$elev_kon)
+as.numeric(levels(kesky_sums$elev_kon))
+kesky_sums$elev_kon <- as.numeric(kesky_sums$elev_kon)
+kesky_sums$elev_kon
+
+# Correlations:
+cor_matrix <- cor(kesky_sums) %>% round(digits = 2)
+#cor_matrix
+corrplot(cor_matrix, method="ellipse", type="upper", cl.pos="b", tl.pos="d", tl.cex=0.6)
+```
+
+Based on this correlation plot, it does not seem like children's media time has any strong effects on either their attention at shool, their school achievement or their reading habits.
+
+```{r}
+
 
 sums_pca <- prcomp(kesky_sums[7:16])
 s2 <- summary(sums_pca)
@@ -159,37 +189,6 @@ biplot(sums_pca, cex = c(0.3, 0.8), col = c("grey40", "deeppink2"), xlab = pc_la
 
 This looks much the same as the previous biplot but it's a lot easier to read. The components seem to be mirrored along the X-axis but are clustered quite similarly. Two components would explain almost 85% of the variance. However, all variables seem to be quite closely related since all arrows point somewhat in the same direction. As in the PCA with all the variables above, one could separate one component having more to do with restlessness and impulsiveness (_moto_ and _imp_ in the biplot) and one component having more to do with maintaining and directing attention as well as executive funtions (_uppr_, _rikt_, _efig_ and _efutf_). These components also seem to make theoretical sense, as motor restlessness and impulsiveness are the clearest signs of ADHD/hyperactive.
 
-Now as stated before, I'm interested in seeing how media usage is connected with attention at school and school achievement. I'll start off by eyeballing my data and then doing a corrplot of the variables that interest me. 
-
-```{r}
-
-
-library(GGally)
-library(ggplot2)
-
-library(corrplot)
-library(dplyr)
-names(kesky_sums)
-
-p <- ggpairs(kesky_sums, mapping = aes(col = elev_kon, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)))
-p
-
-# Need to change the gender variable to numeric to use it in the corrplot:
-
-#kesky_one$elev_kon
-#levels(kesky_one$elev_kon) <-c(1,2)
-#levels(kesky_one$elev_kon)
-#as.numeric(levels(kesky_one$elev_kon))
-#kesky_one$elev_kon <- as.numeric(kesky_one$elev_kon)
-#kesky_one$elev_kon
-
-
-
-# Correlations:
-#cor_matrix <- cor(kesky_one) %>% round(digits = 2)
-#cor_matrix
-#corrplot(cor_matrix, method="ellipse", type="upper", cl.pos="b", tl.pos="d", tl.cex=0.6)
-```
 
 In order to be able to use this in my analyses, I'll try to form latent variables using the sum scores. One strength of latent variables is that they can be used to reduce the dimensions of the data while factoring out the error variance. A latent variable represents some underlying factor that explains the covariance matrix shaped by the measured (or manifest) variables. A latent variable when used in confirmatory analyses should be based on theory. In this case, as stated above, it makes theoretical sense that the questionnaire could be represented by a two-factor model, where one factor explains the most visible signs of ADHD/hyperactive and the other factor explains executive difficulties such as planning and evaluating.
 
@@ -222,59 +221,6 @@ The two factors conform with the theory of ADHD as divided into a) predominantly
 In the subsequent analyses we will use these latent variables to see how they are related to media consumption, reading and school achievement.
 ```{r}
 semPaths(fit.two.sums, what="std", label.cex=1.5, edge.label.cex=1.3)
-
-```
-
-
-
-
-
-Based on this correlation plot, it does not seem like children's media time has any strong effects on either their attention at shool, their school achievement or their reading habits.
-
-Next I'll conduct hierarchical linear regression analyses using first attention then school achievement as target variables. Gender and SES will be included in all models as control variables:
-
-```{r}
-#kesky_lm <- lm(attention ~ medievanor1 + medievanor2 + medievanor3 + read_habs + read_pref + elev_kon + ses, data = kesky_one)
-#summary(kesky_lm)
-
-#kesky_lm2 <- lm(vitsord_ma ~ attention + medievanor1 + medievanor2 + medievanor3 + read_habs + read_pref + elev_kon + ses, data = kesky_one)
-#summary(kesky_lm2)
-
-#kesky_lm3 <- lm(vitsord_mo ~ attention + medievanor1 + medievanor2 + medievanor3 + read_habs + read_pref + elev_kon + ses, data = kesky_one)
-#summary(kesky_lm3)
-
-
-```
-```{r}
-#kesky_lm4 <- lm(read_pref ~ medievanor1 + medievanor2 + medievanor3, data = kesky_one)
-#summary(kesky_lm4)
-
-#kesky_lm5 <- lm(read_habs ~ medievanor1 + medievanor2 + medievanor3, data = kesky_one)
-#summary(kesky_lm5)
-```
-
-So based on the above regressions, it seems that in accordance with our hypotheses: 
-
-* Media time has a small negative effect on attention and achievement at school (H1)
-
-* The effect of media time on school achievement could be mediated by the effect on attention (H3)
-
-However, we did not find an effect of media time on either of the reading measures (habits or preferences, H2).
-
-Because this data does not lend itself to a latent variable approach, I'll conduct patha analyses using manifest sum variables.
-
-```{r}
-
-#pa.model <- ' 
-#ach =~ vitsord_ma + vitsord_mo
-
-#ach ~ attention + read_pref + read_habs
-#attention ~ medievanor1 + medievanor2 + medievanor3
-#read_habs ~ medievanor1 + medievanor2 + medievanor3
-#read_pref ~ medievanor1 + medievanor2 + medievanor3
-#' 
-#fit.pa <- sem(pa.model, data=kesky_one) 
-#summary(fit.pa, fit.measures=TRUE, standardized=TRUE)
 
 ```
 
