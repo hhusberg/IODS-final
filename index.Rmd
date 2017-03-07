@@ -2,7 +2,15 @@
 title: "Final Assignment"
 author: "Henrik Husberg"
 date: "23.02 2017"
-output: html_document
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_depth: 2
+    fig_caption: true
+    fig_width: 6
+    fig_height: 4
+    code_folding: hide
 ---
 henrik.husberg@gmail.com
 ```{r setup, include=FALSE}
@@ -17,16 +25,14 @@ _In the first part of this two-part study we attempt to identify the links betwe
 
 ## Research Questions and Hypotheses
 
-The current research will attempt to address some of the above mentioned issues in two studies: in study 1 we investigate the relationship between television time, internet use and videogame playing and ADHD-related behavior and school achievement in grades 1-9. In Study 2 we investigate the relationship between the three measures of media use, ADHD-related behavior, school achievement and cognitive abilities in grades 1 and 3. In both studies, we control for age, gender and SES. Based on previous research we will test the following hypotheses: 
+Because previous research regarding the connections between media time and attentional difficulties and school achievement has not been very clear, it is my hope that we will be able to distinguish them by a) using a method for removing measurement error (latent variables) and b) by examining separate facets of attentional difficulties and media consumption.
+
+The current research will attempt to address some of the above mentioned issues by investigating the relationship between television time, internet use and videogame playing and ADHD-related behavior and school achievement in grades 1-9, controlling for gender and SES. Based on previous research we will test the following hypothesis: 
 
 **H1:** Media time has a small negative effect on ADHD-related behavior and school achievement.
 
-**H2:** Media time has a negative effect on reading habits, which in turn have a positive effect on attention and achievement at school.
 
-**H3:** An effect of media time on school achievement is partially mediated by increased ADHD-related behavior.
-<!--
-**H4:** An effect of media time on ADHD-related behavior and school achievement is partially mediated by visuospatial ability.
--->
+
 ## Data Wrangling
 
 _**Attention:** This is not a complete dataset and it may not be used outside this course. There are both variables and observations missing. Any inferences to real life are completely fictional and are only used for the purpose of this course. The dataset in its entirety belongs to the Niilo Mäki Institute and results based on the complete dataset will be presented at the JURE2017 conference for those interested._
@@ -145,26 +151,19 @@ setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
 
 kesky_sums <- read.csv2(file = "./data/final_sums_2.csv")
 kesky_sums <- as.data.frame(kesky_sums)
-#kesky_sums[23:32]
-dim(kesky_sums)
-head(kesky_sums)
-names(kesky_sums)
 
 library(GGally)
 library(ggplot2)
 
 library(corrplot)
 library(dplyr)
-names(kesky_sums)
+
 
 # Need to change the gender variable to numeric to use it in the corrplot:
 
-kesky_sums$elev_kon
 levels(kesky_sums$elev_kon) <-c(1,2)
-levels(kesky_sums$elev_kon)
 as.numeric(levels(kesky_sums$elev_kon))
 kesky_sums$elev_kon <- as.numeric(kesky_sums$elev_kon)
-kesky_sums$elev_kon
 
 # Correlations:
 cor_matrix <- cor(kesky_sums) %>% round(digits = 2)
@@ -172,56 +171,125 @@ cor_matrix <- cor(kesky_sums) %>% round(digits = 2)
 corrplot(cor_matrix, method="ellipse", type="upper", cl.pos="b", tl.pos="d", tl.cex=0.6)
 ```
 
-Based on this correlation plot, it does not seem like children's media time has any strong effects on either their attention at shool, their school achievement or their reading habits.
+Based on this correlation plot, it does not seem like children's media time has any strong effects on either their attention at shool, their school achievement or their reading habits. There do seem to be some effects across the variables though. It seems looking at individual items is not a very fruitful approach for this data. There are a couple of reasons for this. First of all, the sheer number of items makes the data difficult to interpret. Second, because every item is scored 0-2 and the data is very heavily zero-inflated, there is not much variance in a single item. Therefore we will now look at the PCA for the sum scores of each individual area of attentional difficulties described above:
+
 
 ```{r}
+kesky_nona <- read.csv2(file = "./data/final_nona.csv")
+kesky_nona <- as.data.frame(kesky_nona)
 
+# Because PCA needs complete data I'll make a subset with only the ATTEX variables and filter out the NA:s:
+attex_sums <- c("dist", "imp", "moto", "rikt", "uppr", "skif", "efig", "efpl", "efutf", "efutv")
+nona_subset <- dplyr::select(kesky_nona, one_of(attex_sums))
+kesky_nona.f <- filter(nona_subset, complete.cases(nona_subset) == TRUE)
+nona_pca <- prcomp(kesky_nona.f[1:10])
+s3 <- summary(nona_pca)
+pca3_pr <- round(100*s3$importance[2, ], digits = 1)
+pca3_pr
 
-sums_pca <- prcomp(kesky_sums[7:16])
-s2 <- summary(sums_pca)
-pca2_pr <- round(100*s2$importance[2, ], digits = 1)
-pca2_pr
-
-pc_lab <- paste0(names(pca2_pr), " (", pca2_pr, "%)")
-pc_lab[1:10]
-biplot(sums_pca, cex = c(0.3, 0.8), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
+pc_lab2 <- paste0(names(pca3_pr), " (", pca3_pr, "%)")
+pc_lab2[1:10]
+biplot(nona_pca, cex = c(0.3, 0.8), col = c("grey40", "deeppink2"), xlab = pc_lab2[1], ylab = pc_lab2[2])
 ```
 
-This looks much the same as the previous biplot but it's a lot easier to read. The components seem to be mirrored along the X-axis but are clustered quite similarly. Two components would explain almost 85% of the variance. However, all variables seem to be quite closely related since all arrows point somewhat in the same direction. As in the PCA with all the variables above, one could separate one component having more to do with restlessness and impulsiveness (_moto_ and _imp_ in the biplot) and one component having more to do with maintaining and directing attention as well as executive funtions (_uppr_, _rikt_, _efig_ and _efutf_). These components also seem to make theoretical sense, as motor restlessness and impulsiveness are the clearest signs of ADHD/hyperactive.
-
+This looks much the same as the previous biplot but it's a lot easier to read. The components seem to be clustered quite similarly. Two components would explain almost 85% of the variance. However, all variables seem to be quite closely related since all arrows point somewhat in the same direction. As in the PCA with all the variables above, one could separate one component having more to do with restlessness and impulsiveness (_moto_ and _imp_ in the biplot) and one component having more to do with maintaining and directing attention as well as executive funtions (_uppr_, _rikt_, _efig_ and _efutf_). These components also seem to make theoretical sense, as motor restlessness and impulsiveness are the clearest signs of ADHD/hyperactive.
 
 In order to be able to use this in my analyses, I'll try to form latent variables using the sum scores. One strength of latent variables is that they can be used to reduce the dimensions of the data while factoring out the error variance. A latent variable represents some underlying factor that explains the covariance matrix shaped by the measured (or manifest) variables. A latent variable when used in confirmatory analyses should be based on theory. In this case, as stated above, it makes theoretical sense that the questionnaire could be represented by a two-factor model, where one factor explains the most visible signs of ADHD/hyperactive and the other factor explains executive difficulties such as planning and evaluating.
 
 I've already lost a bit of information while forming the sum scores, but because there is not enough variance in the original variables that's a tradeoff I'm forced to make. Next I'll use the [lavaan package](http://lavaan.ugent.be/) in order to conduct Confirmatory Factor Analysis and Structural Equation Modeling (CFA/SEM).
+
 ```{r}
 library(lavaan)
-library(semPlot)
-#CFA two factor model of sum variables here
-names(kesky_sums)
+
+#Two factor model of sum variables here, hy defined by moto and imp, ef by the rest of the sum variables
 kesky.model.two.sums <- ' hy =~ moto + imp 
 ef =~ dist + rikt + uppr + skif + efig + efpl + efutf + efutv '
 
-fit.two.sums <- cfa(kesky.model.two.sums, data = kesky_sums)
+# Then I'll run CFA on the above model and print the fit statistics and parameters
+fit.two.sums <- cfa(kesky.model.two.sums, data = kesky_nona)
 cfa.two.sums <- summary(fit.two.sums, fit.measures = TRUE, standardized =TRUE, modindices=TRUE)
-coef(fit.two.sums)
 ```
 
-Lookin at the fit of the model, it does seem to work quite well. I'll repeat the central measurements of model fit below for clarity and the do a semPlot to visualize the model:
+Lookin at the fit of the model, it does seem to work somewhat. I'll repeat the central measurements of model fit below for clarity and the do a semPlot to visualize the model:
+
 ```{r}
 fitMeasures(fit.two.sums, "cfi")
 fitMeasures(fit.two.sums, "rmsea")
 ```
 
-The two factors conform with the theory of ADHD as divided into a) predominantly hyperactive and b) predominantly inattentive. However, the RMSEA goodness of fit index does not indicate an acceptable model fit (should be below 0.6) and the CFI goodness if fit indes is a bit borderline (over .95 preferred).
+The two factors conform with the theory of ADHD as divided into a) predominantly hyperactive and b) predominantly inattentive. However, the RMSEA goodness of fit index does not indicate an acceptable model fit (should be below 0.10) and the CFI goodness if fit indes is a bit borderline (over .95 preferred). I've called the modindices for the CFA (the last part of the long output above) which give us an indication of where the problems might lie in our model. It seems that theres a couple of instances (indicated by high mi values) where manifest variables have high loadings with both latent variables, mainly _dist_ and _efig_. Apart from this, there are a few high correlations between manifest variables, namely between _dist_ and _uppr_ as well as _uppr_ and _efig_ as well as _efig_ and _efpl_. The fact that _dist_ and _efig_ load on both factors is the biggest problem right now. I will allow these loadings, because they do make sense. Apart from motor restlessness and impulsivity, distractibility is heavily associated with ADHD/hyperactive and the Executive Function variable _efig_ describes slowness to get started, and accordingly loads negatively on the hyperactivity factor.
+
+
 ```{r}
+kesky.model.two.sums.b <- ' hy =~ moto + imp + dist + efig
+ef =~ dist + efig + rikt + uppr + skif + efpl + efutf + efutv
+rikt ~~  skif
+rikt ~~ uppr
+efig ~~  rikt
+efutf ~~ efutv
+efpl ~~ efutv
+'
+
+fit.two.sums.b <- cfa(kesky.model.two.sums.b, data = kesky_nona, missing = 'fiml')
+cfa.two.sums.b <- summary(fit.two.sums.b, fit.measures = TRUE, standardized =TRUE, modindices=TRUE)
+
 ```
 
+By allowing these crossloadings and some correlations between manifest variables we have an acceptable model fit (CFI = .98, RMSEA = .085). Now I'll plot this CFA-model using the _semPlot_ library:
 
-
-In the subsequent analyses we will use these latent variables to see how they are related to media consumption, reading and school achievement.
 ```{r}
-semPaths(fit.two.sums, what="std", label.cex=1.5, edge.label.cex=1.3)
+library(semPlot)
+semPaths(fit.two.sums.b, what="std", label.cex=1.5, edge.label.cex=1.3)
 
 ```
+
+What we have now is an indication that the ATTEX questionnaire can be taken to measure two aspects of attentional difficulties that correspond well with the theoretical division of ADHD-like symptoms into the _hyperactive_ kind and the _inattentive_ kind. In the subsequent analyses we will use these latent variables to see how they are related to media consumption, reading and school achievement. In order to use the maximum amount of information but with as little _noise_ or measurement error as possible, we will do this using Structural Equation Modeling. In practice that means looking at a model of regressions between latent variables. Because we cannot form latent variables for all our measurements the model will be a mixture of latent and manifest variables. In the plots, manifest variables are represented by rectangles while latent variables are represented by ovals.
+
+Here's my hypothesized model for the relationships:
+
+```{r}
+
+# Need to rename som variables so as to not cause too much confusion:
+library(reshape)
+kesky_nona <- rename(kesky_nona, c(elev_kon="gender", vitsord_mo="Swedish", vitsord_ma="Math", utb_pabygg_pappa="ed_fa", utb_pabygg_mamma="ed_mo"))
+
+kesky.model.two.sums.c <- ' 
+
+# Measurement part
+hy =~ moto + imp + dist + efig
+ef =~ dist + efig + rikt + uppr + skif + efpl + efutf + efutv
+gpa =~ Math + Swedish
+ses =~ ed_fa + ed_mo
+
+# Structural part
+#ef + hy ~ medievanor1 + medievanor2 + medievanor3
+gpa ~ ef + hy + ses + gender + medievanor1 + medievanor2 + medievanor3
+
+# Residual correlations
+rikt ~~  skif
+rikt ~~ uppr
+efig ~~  rikt
+efutf ~~ efutv
+efpl ~~ efutv
+'
+
+fit.two.sums.c <- sem(kesky.model.two.sums.c, data = kesky_nona, missing='fiml')
+
+
+sem.two.sums.c <- summary(fit.two.sums.c, fit.measures = TRUE, standardized =TRUE)
+
+
+semPaths(fit.two.sums.c,style="lisrel", 
+        whatLabels = "std", edge.label.cex = .6, node.label.cex = .6, 
+        label.prop=0.9, edge.label.color = "black", rotation = 4, 
+        equalizeManifests = FALSE, optimizeLatRes = TRUE, node.width = 1.5, 
+        edge.width = 0.5, shapeMan = "rectangle", shapeLat = "ellipse", 
+        shapeInt = "triangle", sizeMan = 4, sizeInt = 2, sizeLat = 4, 
+        curve=2, unCol = "#070b8c")
+```
+
+This model fits the data pretty well. In it media time is included as three separate manifest variables (md1-md3). From the output under _Regressions_ we can see that the _ef_ factor, what I've here called Executive Function difficulties, does indeed negatively affect students' _gpa_. Interistingly, the _hy_ factor, hyperactivity, does not have a significant effect on _gpa_. The effect of _gender_ is significant, a positive correlation here indicating that girls (coded as 2) have better _gpa_ than boys (coded as 1). Finally, higher _ses_ corresponds with higher _gpa_.
+
+None of the three manifest variables for media time had any significant effect on _gpa_ when included in a model controlling for gender and socioeconomic status.
 
 ## Discussion

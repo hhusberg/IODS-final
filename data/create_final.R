@@ -14,20 +14,13 @@ library(memisc)
 setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
 kesky_all <- as.data.set(spss.system.file("./data/Kesky_luvat_final_tausta_very_short_3.sav"))
 str(kesky_all)
-summary(kesky_all$utb_grund_mamma)
-summary(kesky_all$medicinering)
 summary(kesky_all$medievanor1)
-summary(kesky_all$skola_nummer)
-summary(kesky_all$hur_garna_lasbarn1)
 summary(kesky_all$hur_ofta_lasbarn1)
 kesky_all$skola_nummer <- as.factor(kesky_all$skola_nummer)
 kesky_all <- as.data.frame(kesky_all)
 str(kesky_all)
-summary(kesky_all$utb_grund_mamma)
-summary(kesky_all$medicinering)
 summary(kesky_all$medievanor1)
-summary(kesky_all$skola_nummer)
-summary(kesky_all$hur_garna_lasbarn1)
+summary(kesky_all$hur_ofta_lasbarn1)
 
 
 # So far so good: got the data into a data frame and it looks pretty solid. Above I checked out some of the variables and converted one 
@@ -211,6 +204,7 @@ head(efig_columns)
 kesky_nona$efig <- rowSums(efig_columns)
 kesky_nona$efig
 
+
 efpl_columns <- kesky_subset[42:45]
 head(efpl_columns)
 kesky_nona$efpl <- rowSums(efpl_columns)
@@ -231,15 +225,25 @@ str(kesky_nona)
 dim(kesky_nona)
 names(kesky_nona)
 
-# In this dataset, I only want to keep the ATTEX sum variables (and the gender variable):
+# In this dataset, I only want to keep the ATTEX sum variables, the gender variable and the media, reading and ses variables. First to go are the
+# item level variables for the ATTEX:
 
-remove5 <- names(kesky_nona[2:77])
+remove5 <- names(kesky_nona[2:56])
 remove5
 library(dplyr)
 
 kesky_nona <- dplyr::select(kesky_nona, -one_of(remove5))
 names(kesky_nona)
 
+#Next to go are the superfluous reading variables (the ones that don't have anything to do with homework or literature):
+
+remove6 <- c("hur_ofta_lasbarn4", "hur_ofta_lasbarn6", "hur_ofta_lasbarn7", "hur_garna_lasbarn4", "hur_garna_lasbarn6", "hur_garna_lasbarn7")
+remove6
+
+kesky_nona <- dplyr::select(kesky_nona, -one_of(remove6))
+names(kesky_nona)
+
+dim(kesky_nona)
 
 # Because one viable way of using the questionnaire data is a single sum variable, I'll go ahead and create a dataframe for that as well:
 
