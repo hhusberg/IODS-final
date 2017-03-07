@@ -293,3 +293,5 @@ This model fits the data pretty well. In it media time is included as three sepa
 None of the three manifest variables for media time had any significant effect on _gpa_ when included in a model controlling for gender and socioeconomic status.
 
 ## Discussion
+
+Based on these results it might be the case that the negative effects of media time are less than previously feared. 
