@@ -41,7 +41,7 @@ Read the data from SPSS-generated csv-file. I've wrangled the data quite a bit. 
 
 ## Data Description
 
-The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. The data was collected by the [Niilo Maki Institute](www.nmi.fi) and the collection coordinated by myself and my colleague as part of our work for the [ILS-project](www.inlarningochstod.fi). Respondents are teachers and parents of Swedish speaking children in grades 1-9 and the sample is geographically representative of Swedish speaking Finland. The data coems from three separate questionnaires: a) _Keskittymiskysely_ questionnaire regarding children's attention and executive function in the classroom (teacher reported), b) _School achievement_ questionnaire regarding children's achievement and need for support at school (teacher reported) and c) _Background_ questionnaire regarding reading habits and screen time (parent reported). 
+The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. The data was collected by the [Niilo Maki Institute](https://www.nmi.fi/fi) and the collection coordinated by myself and my colleague as part of our work for the [ILS-project](http://inlarningochstod.fi/). Respondents are teachers and parents of Swedish speaking children in grades 1-9 and the sample is geographically representative of Swedish speaking Finland. The data comes from three separate questionnaires: a) _Keskittymiskysely_ questionnaire regarding children's attention and executive function in the classroom (teacher reported), b) _School achievement_ questionnaire regarding children's achievement and need for support at school (teacher reported) and c) _Background_ questionnaire regarding reading habits and screen time (parent reported). 
 
 Data from the questionnaires a) and b) was entered into an SPSS-matrix by myself, and coded numerically as scale or nominal variables. Data from questionnaire c) was entered into a separate SPSS-matrix by a colleague. The datafiles were merged by myself based on unique identification numbers. Some variable scales were altered in SPSS before importing the data into the Data Wrangling script for this assignment.
 
@@ -156,8 +156,7 @@ Looking at the distributions we can see very clearly how heavily zero-inflated e
 
 Based on the correlation plot, it does not seem like children's media time has any strong effects on either their attention at shool, their school achievement or their reading habits. There do seem to be some effects across the variables though. 
 
-We will now look at the PCA for the sum scores of each individual area of attentional difficulties described above. Because the sum scores are made up of different amounts of items we now need to scale the data first.
-
+We will now look at the PCA for the sum scores of each individual area of attentional difficulties described above. Because the sum scores are made up of different amounts of items we now need to scale the data first. 
 
 ```{r}
 kesky_nona <- read.csv2(file = "./data/final_nona.csv")
@@ -167,6 +166,7 @@ kesky_nona <- as.data.frame(kesky_nona)
 attex_sums <- c("dist", "imp", "moto", "rikt", "uppr", "skif", "efig", "efpl", "efutf", "efutv")
 nona_subset <- dplyr::select(kesky_nona, one_of(attex_sums))
 kesky_nona.f <- filter(nona_subset, complete.cases(nona_subset) == TRUE)
+dim(kesky_nona.f)
 
 #Then scale the data and run the PCA and draw the biplot:
 kesky_nona.sc <- scale(kesky_nona.f)
@@ -199,7 +199,7 @@ fit.two.sums <- cfa(kesky.model.two.sums, data = kesky_nona)
 cfa.two.sums <- summary(fit.two.sums, fit.measures = TRUE, standardized =TRUE, modindices=TRUE)
 ```
 
-Lookin at the fit of the model, it does seem to work somewhat. I'll repeat the central measurements of model fit below for clarity and the do a semPlot to visualize the model:
+Lookin at the fit of the model, it does seem to work somewhat. Below I'll print the two fit indices I will be using to judge the goodness of fit of the models:
 
 ```{r}
 fitMeasures(fit.two.sums, "cfi")

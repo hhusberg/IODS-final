@@ -172,7 +172,7 @@ $(document).ready(function () {
 </div>
 <div id="data-description" class="section level2">
 <h2>Data Description</h2>
-<p>The data I have is take from an ongoing study into Swedish speaking childrens’ attention and executive skills at school. The data was collected by the <a href="www.nmi.fi">Niilo Maki Institute</a> and the collection coordinated by myself and my colleague as part of our work for the <a href="www.inlarningochstod.fi">ILS-project</a>. Respondents are teachers and parents of Swedish speaking children in grades 1-9 and the sample is geographically representative of Swedish speaking Finland. The data coems from three separate questionnaires: a) <em>Keskittymiskysely</em> questionnaire regarding children’s attention and executive function in the classroom (teacher reported), b) <em>School achievement</em> questionnaire regarding children’s achievement and need for support at school (teacher reported) and c) <em>Background</em> questionnaire regarding reading habits and screen time (parent reported).</p>
+<p>The data I have is take from an ongoing study into Swedish speaking childrens’ attention and executive skills at school. The data was collected by the <a href="https://www.nmi.fi/fi">Niilo Maki Institute</a> and the collection coordinated by myself and my colleague as part of our work for the <a href="http://inlarningochstod.fi/">ILS-project</a>. Respondents are teachers and parents of Swedish speaking children in grades 1-9 and the sample is geographically representative of Swedish speaking Finland. The data comes from three separate questionnaires: a) <em>Keskittymiskysely</em> questionnaire regarding children’s attention and executive function in the classroom (teacher reported), b) <em>School achievement</em> questionnaire regarding children’s achievement and need for support at school (teacher reported) and c) <em>Background</em> questionnaire regarding reading habits and screen time (parent reported).</p>
 <p>Data from the questionnaires a) and b) was entered into an SPSS-matrix by myself, and coded numerically as scale or nominal variables. Data from questionnaire c) was entered into a separate SPSS-matrix by a colleague. The datafiles were merged by myself based on unique identification numbers. Some variable scales were altered in SPSS before importing the data into the Data Wrangling script for this assignment.</p>
 <p>After wrangling around I’ve got the below datafile to work with. I’ve decided to go all continuous with this dataset. Most variables are measured on a Likert-type scale with ranges varying from 3 to 7.</p>
 <pre class="r"><code>setwd(&quot;C:/Users/hehusb/Documents/GitHub/IODS-final&quot;)
@@ -308,8 +308,9 @@ kesky_nona &lt;- as.data.frame(kesky_nona)
 attex_sums &lt;- c(&quot;dist&quot;, &quot;imp&quot;, &quot;moto&quot;, &quot;rikt&quot;, &quot;uppr&quot;, &quot;skif&quot;, &quot;efig&quot;, &quot;efpl&quot;, &quot;efutf&quot;, &quot;efutv&quot;)
 nona_subset &lt;- dplyr::select(kesky_nona, one_of(attex_sums))
 kesky_nona.f &lt;- filter(nona_subset, complete.cases(nona_subset) == TRUE)
-
-#Then scale the data and run the PCA and draw the biplot:
+dim(kesky_nona.f)</code></pre>
+<pre><code>## [1] 501  10</code></pre>
+<pre class="r"><code>#Then scale the data and run the PCA and draw the biplot:
 kesky_nona.sc &lt;- scale(kesky_nona.f)
 nona_pca &lt;- prcomp(kesky_nona.sc)
 s3 &lt;- summary(nona_pca)
@@ -482,7 +483,7 @@ cfa.two.sums &lt;- summary(fit.two.sums, fit.measures = TRUE, standardized =TRUE
 ## 76  efpl ~~ efutf   3.860  0.105   0.105    0.022    0.022
 ## 77  efpl ~~ efutv  26.434  0.128   0.128    0.067    0.067
 ## 78 efutf ~~ efutv   2.612 -0.074  -0.074   -0.021   -0.021</code></pre>
-<p>Lookin at the fit of the model, it does seem to work somewhat. I’ll repeat the central measurements of model fit below for clarity and the do a semPlot to visualize the model:</p>
+<p>Lookin at the fit of the model, it does seem to work somewhat. Below I’ll print the two fit indices I will be using to judge the goodness of fit of the models:</p>
 <pre class="r"><code>fitMeasures(fit.two.sums, &quot;cfi&quot;)</code></pre>
 <pre><code>##   cfi 
 ## 0.935</code></pre>
