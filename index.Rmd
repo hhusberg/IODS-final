@@ -35,14 +35,14 @@ The current research will attempt to address some of the above mentioned issues 
 
 ## Data Wrangling
 
-_**Attention:** This is not a complete dataset and it may not be used outside this course. There are both variables and observations missing. Any inferences to real life are completely fictional and are only used for the purpose of this course. The dataset in its entirety belongs to the Niilo Mäki Institute and results based on the complete dataset will be presented at the JURE2017 conference for those interested._
+_**Attention:** This is not a complete dataset and it may not be used outside this course. There are both variables and observations missing. Any inferences to real life are completely fictional and are only used for the purpose of this course. The dataset in its entirety belongs to the Niilo Maki Institute and results based on the complete dataset will be presented at the JURE2017 conference for those interested._
 
 Read the data from SPSS-generated csv-file. I've wrangled the data quite a bit. The script can be found [here](https://github.com/hhusberg/IODS-final/blob/master/data/create_final.R).
 
 
 ## Data Description
 
-The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. The data was collected by the [Niilo Mäki Institute](www.nmi.fi) and the collection coordinated by myself and my colleague as part of our work for the [ILS-project](www.inlarningochstod.fi). Respondents are teachers and parents of Swedish speaking children in grades 1-9 and the sample is geographically representative of Swedish speaking Finland. The data coems from three separate questionnaires: a) _Keskittymiskysely_ questionnaire regarding children's attention and executive function in the classroom (teacher reported), b) _School achievement_ questionnaire regarding children's achievement and need for support at school (teacher reported) and c) _Background_ questionnaire regarding reading habits and screen time (parent reported). 
+The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. The data was collected by the [Niilo Maki Institute](www.nmi.fi) and the collection coordinated by myself and my colleague as part of our work for the [ILS-project](www.inlarningochstod.fi). Respondents are teachers and parents of Swedish speaking children in grades 1-9 and the sample is geographically representative of Swedish speaking Finland. The data coems from three separate questionnaires: a) _Keskittymiskysely_ questionnaire regarding children's attention and executive function in the classroom (teacher reported), b) _School achievement_ questionnaire regarding children's achievement and need for support at school (teacher reported) and c) _Background_ questionnaire regarding reading habits and screen time (parent reported). 
 
 Data from the questionnaires a) and b) was entered into an SPSS-matrix by myself, and coded numerically as scale or nominal variables. Data from questionnaire c) was entered into a separate SPSS-matrix by a colleague. The datafiles were merged by myself based on unique identification numbers. Some variable scales were altered in SPSS before importing the data into the Data Wrangling script for this assignment.
 
