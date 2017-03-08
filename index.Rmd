@@ -35,14 +35,18 @@ The current research will attempt to address some of the above mentioned issues 
 
 ## Data Wrangling
 
-_**Attention:** This is not a complete dataset and it may not be used outside this course. There are both variables and observations missing. Any inferences to real life are completely fictional and are only used for the purpose of this course. The dataset in its entirety belongs to the Niilo MÃ¤ki Institute and results based on the complete dataset will be presented at the JURE2017 conference for those interested._
+_**Attention:** This is not a complete dataset and it may not be used outside this course. There are both variables and observations missing. Any inferences to real life are completely fictional and are only used for the purpose of this course. The dataset in its entirety belongs to the Niilo Mäki Institute and results based on the complete dataset will be presented at the JURE2017 conference for those interested._
 
-Read the data from SPSS-generated csv-file. I've wrangled the data quite a bit (actually even a lot more than shows in the script file). The script can be found [here](https://github.com/hhusberg/IODS-final/blob/master/data/create_final.R).
+Read the data from SPSS-generated csv-file. I've wrangled the data quite a bit. The script can be found [here](https://github.com/hhusberg/IODS-final/blob/master/data/create_final.R).
 
 
 ## Data Description
 
-The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. After wrangling around I've got this datafile to work with. I've decided to go all continuous with this dataset. Most variables are measured on a Likert-type scale with ranges varying from 3 to 7.
+The data I have is take from an ongoing study into Swedish speaking childrens' attention and executive skills at school. The data was collected by the [Niilo Mäki Institute](www.nmi.fi) and the collection coordinated by myself and my colleague as part of our work for the [ILS-project](www.inlarningochstod.fi). Respondents are teachers and parents of Swedish speaking children in grades 1-9 and the sample is geographically representative of Swedish speaking Finland. The data coems from three separate questionnaires: a) _Keskittymiskysely_ questionnaire regarding children's attention and executive function in the classroom (teacher reported), b) _School achievement_ questionnaire regarding children's achievement and need for support at school (teacher reported) and c) _Background_ questionnaire regarding reading habits and screen time (parent reported). 
+
+Data from the questionnaires a) and b) was entered into an SPSS-matrix by myself, and coded numerically as scale or nominal variables. Data from questionnaire c) was entered into a separate SPSS-matrix by a colleague. The datafiles were merged by myself based on unique identification numbers. Some variable scales were altered in SPSS before importing the data into the Data Wrangling script for this assignment.
+
+After wrangling around I've got the below datafile to work with. I've decided to go all continuous with this dataset. Most variables are measured on a Likert-type scale with ranges varying from 3 to 7.
 
 ```{r}
 setwd("C:/Users/hehusb/Documents/GitHub/IODS-final")
@@ -54,57 +58,30 @@ dim(kesky)
 ```
 
 
-### Attention & executive function: measured by a 55-item questionnaire (variables 2-56)
+### Attention & executive function: measured by a 55-item questionnaire
+The questionnaire (ATTEX) is filled out by children's teachers. The items are statements concerning observed problems in the classroom regarding attention and executive functions, divided into 10 subscales (presented later).  All items are answered on a 3-grade Likert scale ranging from 0 ("Not a problem") to 2 ("Often a problem").
 
-```{r}
-which(names(kesky)%in%c("dist_01", "efutv_55"))
-#summary(kesky[, 2:56])
-```
+### School achievement: mesured by 2 questions (math/Swedish grade)
+Teacher reported latest grade, or if not graded, teacher's approximation of whcih grade the child would have received.
 
-### School achievement: mesured by 2 questions (math/Swedish grade) (variables 57-58)
+### Media time: Measured by 3-item questionnaire where md1 = TV time, md2 = Internet time and md3 = Video game time
+Parent reported average daily time in hours child spends 1) watching television shows 2) surfing the internet and 3) playing video games. Alternatives: _not at all, less than 1 hour, 1 hour, 2 hours, 3 hours, 4 hours, 5 hours or more_.
 
-```{r}
-which(names(kesky)%in%c("vitsord_ma", "vitsord_mo"))
-#summary(kesky[, 57:58])
-```
+### Reading habits: Measured by 4 questions and Reading preferences: Measured by 4 questions
+Reading habits are measured on a 6-point Likert-type scale ranging from _sometimes_ to _many times a day_. Reading preferences is measured on a 7-point Likert-type scale, ranging from _Very unwillingly_ to _Very willingly_. For both measurements there are two questions related to homework reading (Swedish and Other) and two questions related to non-school related literature (Novels and Comics).
 
-### Media time: Measured by 3-item questionnaire where q1 = TV time, q2 = Internet time and q3 = Video game time (variables 61-63)
-
-```{r}
-which(names(kesky)%in%c("medievanor1", "medievanor3"))
-#summary(kesky[, 61:63])
-```
-
-### Reading preferences: Measured by 7 questions (variables 74-80) and Reading habits: Measured by 7 questions (variables 81-87)
-
-```{r}
-which(names(kesky)%in%c("hur_garna_lasbarn7", "hur_ofta_lasbarn1"))
-#summary(kesky[, 64:77])
-```
-
-
-### Control variables: SES, here measured by parents' highest educational level (variables 65-66) and gender, (variable 2)
-
-```{r}
-which(names(kesky)%in%c("utb_pabygg_mamma", "utb_pabygg_pappa"))
-#summary(kesky[, 59:60])
-
-which(names(kesky)%in%c("elev_kon"))
-#summary(kesky[, 1])
-```
-
+### Control variables: SES, here measured by mothers and fathers highest educational level and gender (Girl=1, Boy=2)
+We use parents' self-reported highest level of education as a proxy for socioeconomic status.
 
 ## Method
-
-
-
+I will be using a combination of exploratory and confirmatory dimension reduction techniques to fit the collected data to a structural model. First, I will use Principal Component Analysis to explore the data and look for patterns. I will then interpret those patterns in relationship to existant theories regarding attention difficulties and try to fit the data to a confirmatory factor model. In the last step of my analysis I will analyze the relationships between the variables of interest using Structural Equation Modeling. This will allow me to partial out the measurement error always present in questionnaires.
 
 ## Results
 
 First of all I want to reduce the amount of variables measuring attention. This data with 55 variables is very unyieldy. I'll start by  exploring the patterns of this data. 
 
 ```{r}
-#First I'll make a dataframe with only the ATTEX variables:
+#First I'll make a dataframe with only the ATTEX variables. The scale is all the same for these so no standardization is needed:
 kesky_only <- kesky[, 2:56]
 #summary(kesky_only)
 dim(kesky_only)
@@ -157,10 +134,15 @@ library(ggplot2)
 
 library(corrplot)
 library(dplyr)
+#I'll make a subset of the most central variables of interest so I can fit it into one graph to look at the distributions:
+dists <- c("vitsord_ma", "vitsord_mo", "medievanor1", "medievanor2", "medievanor3", "dist", "imp", "moto", "rikt", "uppr", "skif", "efig", "efpl", "efutf", "efutv")
+subset_dists <- dplyr::select(kesky_sums, one_of(dists))
 
+p2 <- ggpairs(subset_dists, mapping = aes(alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)))
+p2
 
 # Need to change the gender variable to numeric to use it in the corrplot:
-
+levels(kesky_sums$elev_kon)
 levels(kesky_sums$elev_kon) <-c(1,2)
 as.numeric(levels(kesky_sums$elev_kon))
 kesky_sums$elev_kon <- as.numeric(kesky_sums$elev_kon)
@@ -171,7 +153,11 @@ cor_matrix <- cor(kesky_sums) %>% round(digits = 2)
 corrplot(cor_matrix, method="ellipse", type="upper", cl.pos="b", tl.pos="d", tl.cex=0.6)
 ```
 
-Based on this correlation plot, it does not seem like children's media time has any strong effects on either their attention at shool, their school achievement or their reading habits. There do seem to be some effects across the variables though. It seems looking at individual items is not a very fruitful approach for this data. There are a couple of reasons for this. First of all, the sheer number of items makes the data difficult to interpret. Second, because every item is scored 0-2 and the data is very heavily zero-inflated, there is not much variance in a single item. Therefore we will now look at the PCA for the sum scores of each individual area of attentional difficulties described above:
+Looking at the distributions we can see very clearly how heavily zero-inflated even the sum scores are. The other variables (grades and media time 1-3) show some approximations of normal distributions.
+
+Based on the correlation plot, it does not seem like children's media time has any strong effects on either their attention at shool, their school achievement or their reading habits. There do seem to be some effects across the variables though. 
+
+We will now look at the PCA for the sum scores of each individual area of attentional difficulties described above. Because the sum scores are made up of different amounts of items we now need to scale the data first.
 
 
 ```{r}
@@ -182,8 +168,12 @@ kesky_nona <- as.data.frame(kesky_nona)
 attex_sums <- c("dist", "imp", "moto", "rikt", "uppr", "skif", "efig", "efpl", "efutf", "efutv")
 nona_subset <- dplyr::select(kesky_nona, one_of(attex_sums))
 kesky_nona.f <- filter(nona_subset, complete.cases(nona_subset) == TRUE)
-nona_pca <- prcomp(kesky_nona.f[1:10])
+
+#Then scale the data and run the PCA and draw the biplot:
+kesky_nona.sc <- scale(kesky_nona.f)
+nona_pca <- prcomp(kesky_nona.sc)
 s3 <- summary(nona_pca)
+s3
 pca3_pr <- round(100*s3$importance[2, ], digits = 1)
 pca3_pr
 
@@ -192,7 +182,7 @@ pc_lab2[1:10]
 biplot(nona_pca, cex = c(0.3, 0.8), col = c("grey40", "deeppink2"), xlab = pc_lab2[1], ylab = pc_lab2[2])
 ```
 
-This looks much the same as the previous biplot but it's a lot easier to read. The components seem to be clustered quite similarly. Two components would explain almost 85% of the variance. However, all variables seem to be quite closely related since all arrows point somewhat in the same direction. As in the PCA with all the variables above, one could separate one component having more to do with restlessness and impulsiveness (_moto_ and _imp_ in the biplot) and one component having more to do with maintaining and directing attention as well as executive funtions (_uppr_, _rikt_, _efig_ and _efutf_). These components also seem to make theoretical sense, as motor restlessness and impulsiveness are the clearest signs of ADHD/hyperactive.
+This looks much the same as the previous biplot but it's a lot easier to read. The components seem to be clustered quite similarly. Two components would explain a bit over 80% of the variance. However, all variables seem to be quite closely related since all arrows point somewhat in the same direction. As in the PCA with all the variables above, one could separate one component having more to do with restlessness and impulsiveness (_moto_ and _imp_ and perhaps _dist_ in the biplot) and one component having more to do with maintaining and directing attention as well as executive funtions (_uppr_, _rikt_, _efig_ and _skif_). These components also seem to make theoretical sense, as motor restlessness and impulsiveness are the clearest signs of ADHD/hyperactive.
 
 In order to be able to use this in my analyses, I'll try to form latent variables using the sum scores. One strength of latent variables is that they can be used to reduce the dimensions of the data while factoring out the error variance. A latent variable represents some underlying factor that explains the covariance matrix shaped by the measured (or manifest) variables. A latent variable when used in confirmatory analyses should be based on theory. In this case, as stated above, it makes theoretical sense that the questionnaire could be represented by a two-factor model, where one factor explains the most visible signs of ADHD/hyperactive and the other factor explains executive difficulties such as planning and evaluating.
 
@@ -243,7 +233,7 @@ semPaths(fit.two.sums.b, what="std", label.cex=1.5, edge.label.cex=1.3)
 
 ```
 
-What we have now is an indication that the ATTEX questionnaire can be taken to measure two aspects of attentional difficulties that correspond well with the theoretical division of ADHD-like symptoms into the _hyperactive_ kind and the _inattentive_ kind. In the subsequent analyses we will use these latent variables to see how they are related to media consumption, reading and school achievement. In order to use the maximum amount of information but with as little _noise_ or measurement error as possible, we will do this using Structural Equation Modeling. In practice that means looking at a model of regressions between latent variables. Because we cannot form latent variables for all our measurements the model will be a mixture of latent and manifest variables. In the plots, manifest variables are represented by rectangles while latent variables are represented by ovals.
+What we have now is an indication that the ATTEX questionnaire can be taken to measure two aspects of attentional difficulties that correspond well with the theoretical division of ADHD-like symptoms into the _hyperactive_ kind and the _inattentive_ kind. In the subsequent analyses we will use these latent variables to see how they are related to media consumption, reading and school achievement. In order to use the maximum amount of information but with as little _noise_ or measurement error as possible, we will do this using Structural Equation Modeling. In practice that means looking at a model of regressions between latent variables. Because we cannot form latent variables for all our measurements the model will be a mixture of latent and manifest variables. In the plots, manifest variables are represented by rectangles while latent variables are represented by ovals. Indicators for latent variables are separable from other manifest variables by looking at the direction of the arrow (arrows pointing towards latent variables represent regression paths for the SEM model while arrows pointing towards a manifest variable indicates factor loadings).
 
 Here's my hypothesized model for the relationships:
 
@@ -288,10 +278,16 @@ semPaths(fit.two.sums.c,style="lisrel",
         curve=2, unCol = "#070b8c")
 ```
 
-This model fits the data pretty well. In it media time is included as three separate manifest variables (md1-md3). From the output under _Regressions_ we can see that the _ef_ factor, what I've here called Executive Function difficulties, does indeed negatively affect students' _gpa_. Interistingly, the _hy_ factor, hyperactivity, does not have a significant effect on _gpa_. The effect of _gender_ is significant, a positive correlation here indicating that girls (coded as 2) have better _gpa_ than boys (coded as 1). Finally, higher _ses_ corresponds with higher _gpa_.
+This model fits the data pretty well (CFI = .955, RMSEA = .066). In it media time is included as three separate manifest variables (md1-md3). From the output under _Regressions_ we can see that the _ef_ factor, what I've here called Executive Function difficulties, does indeed negatively affect students' _gpa_. Interistingly, the _hy_ factor, hyperactivity, does not have a significant effect on _gpa_. The effect of _gender_ is significant, a positive correlation here indicating that girls (coded as 2) have better _gpa_ than boys (coded as 1). Finally, higher _ses_ corresponds with higher _gpa_. 
 
 None of the three manifest variables for media time had any significant effect on _gpa_ when included in a model controlling for gender and socioeconomic status.
 
 ## Discussion
 
-Based on these results it might be the case that the negative effects of media time are less than previously feared. 
+_Here I will remind readers that this is still a preliminary analysis based in incomplete data and that the full analysis will be presented at JURE2017 in Tampere._
+
+First of all, the CFA model of the ATTEX-questionnaire seems to validate previous findings (using a different sample and different techniques for analysis) of the questionnaires ability to discriminate ADHD symptoms of the hyperactive kind from the inattentive kind. This in and of itself is valuable information. 
+
+Also, based on the above results it might be the case that the negative effects of media time are less than previously feared, if significant at all. These results support previous research showing that it would most probably be more fruitful to focus on other variables affecting children's school achievement.
+
+Other important results presented in this study is the fact that while inattentive symptoms seem to affect students' grade point average, hyperactive symptoms do not. This is potentially important information for practitioners, since the hyperactive symptoms are the ones to usually receive more attention. This us due to the fact that they are more visible and more disruptive in the classroom. The reason why they do not negatively affect GPA while inattentive symptoms do could be one of two: a) the hyperactive children get more and faster help with their difficulties because they are more easily noticed or b) they actually struggle more at school because of differences between the two types of difficulties. In order to see which is the case we will need to collect data from a) tests of ability and/or b) amount of support received.  
